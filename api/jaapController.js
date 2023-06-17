@@ -5,7 +5,6 @@ const MantraJaaps = require('../models/mantraJaaps');
 const UserJaaps = require('../models/userJaaps');
 var CryptoJS = require("crypto-js");
 var jwt = require('jsonwebtoken');
-const { CostExplorer } = require('aws-sdk');
 
 var SHA256 = require("crypto-js/sha256");
 module.exports = {
@@ -51,7 +50,7 @@ module.exports = {
             let userId=req.query.userId;
             let jaapObj = await MantraJaaps.findOne({ isDeleted: 'N',jaapId:jaapId });
             if (jaapObj) {
-                let userJaapObj = await UserJaaps.findOne({ userId: userId, jaapId: jaapId },{jaaps:{$slice: -50}});
+                let userJaapObj = await UserJaaps.findOne({ userId: userId, jaapId: jaapId },{jaaps:{$slice: -100}});
                 responce = JSON.stringify({ code: '200', message: "success", data: jaapObj,userJaapData:userJaapObj });
                 res.status(200).send(responce);
             } else {
@@ -94,6 +93,7 @@ module.exports = {
             let challengeTarget = req.query.challengeTarget;
             let challengeAmount = req.query.challengeAmount;
             let info = req.query.info;
+            let audio='';
             console.log("startDate:" + startDate + "   endDate:" + endDate)
             startDate = moment(startDate).format('YYYY-MM-DD[T00:00:00.000Z]');
             endDate = moment(endDate).format('YYYY-MM-DD[T00:00:00.000Z]');
@@ -118,7 +118,8 @@ module.exports = {
                 challengeAmount:challengeAmount,
                 info:info,
                 counter:0,
-                isDeleted: 'N'
+                isDeleted: 'N',
+                audio:audio
             }
             console.log("param:" + JSON.stringify(param));
 
@@ -158,6 +159,8 @@ module.exports = {
                 //console.log("userJaapData:" + JSON.stringify(userJaapData.jaaps)+"==="+userJaapData.jaaps.length)
                 try {
                     let counter=userJaapData.jaaps.length+1;
+
+                    
                     userJaapData.counter=counter;
                     userJaapData.jaaps.push(jaapParam);
                     userJaapData.challengeWinner="N";
@@ -169,7 +172,9 @@ module.exports = {
                         }
                     }
                     jaapObj = await userJaapData.save();
+                    
                     mantrJaapData.counter=mantrJaapData.counter+1;
+                    
                     mantraJaapObj = await mantrJaapData.save();
                     
                 } catch (err) {
@@ -190,6 +195,10 @@ module.exports = {
                     isDeleted: 'N'
                 }
                 userJaapData = await UserJaaps.create(param);
+                
+                mantrJaapData.counter=mantrJaapData.counter+1;
+                
+                mantraJaapObj = await mantrJaapData.save();
 
             }
 

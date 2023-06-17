@@ -48,6 +48,14 @@ const jaapSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    challengInfo: {
+      type: String,
+      default: '',
+    },
+    audio: {
+      type: String,
+      default: '',
+    },
     isDeleted: {
       type: String,
       default: "N",
