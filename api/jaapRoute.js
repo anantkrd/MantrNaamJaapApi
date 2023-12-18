@@ -16,5 +16,6 @@ router.get('/addUserJaaps', jaapController.addUserJaaps);
 
 router.get('/getJaapUserList', jaapController.getJaapUserList);
 
+router.get('/jaapCounter', jaapController.jaapCounter);
 
 module.exports = router;

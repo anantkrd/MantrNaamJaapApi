@@ -12,7 +12,7 @@ module.exports = {
     getJaaps: async (req, res) => {
         try {
 
-            let jaapObj = await MantraJaaps.find({ isDeleted: 'N',isChallenges:'N' });
+            let jaapObj = await MantraJaaps.find({ isDeleted: 'N',isChallenges:'N' }).sort('-createdAt');
             if (jaapObj) {
                 responce = JSON.stringify({ code: '200', message: "success", data: jaapObj });
                 res.status(200).send(responce);
@@ -207,6 +207,55 @@ module.exports = {
                 res.status(200).send(responce);
             } else {
                 responce = JSON.stringify({ code: '404', message: "Invalid jaap", data: '' });
+                res.status(500).send(responce);
+            }
+        } catch (e) {
+            console.log(e)
+            responce = JSON.stringify({ code: '501', message: "some internal error", data: '' });
+            res.status(500).send(responce);
+        }
+    },
+    
+    jaapCounter: async (req, res) => {
+        try {
+            let userId = req.body.userId;
+            let counter = req.body.counter;
+            let audio='';
+            console.log("counter:" + counter)
+            jaapDate = moment().format('YYYY-MM-DD');
+            findUserObj = await MantraJaaps.findOne().sort('-jaapId');
+            jaapId = 1;
+            if (findUserObj == null) {
+                jaapId = 1;
+            } else {
+                jaapId = findUserObj.jaapId + 1;
+            }
+            let bgImageUrl=process.env.Cloud_url+""+bgImage;
+            let cardImageUrl=process.env.Cloud_url+""+cardImage;
+            param = {
+                jaapId: jaapId,
+                title: title,
+                startDate: startDate,
+                endDate: endDate,
+                isChallenges: isChallenges,
+                image:cardImageUrl,
+                bgimage:bgImageUrl,
+                challengeTarget:challengeTarget,
+                challengeAmount:challengeAmount,
+                info:info,
+                counter:0,
+                isDeleted: 'N',
+                audio:audio
+            }
+            console.log("param:" + JSON.stringify(param));
+
+            let userObj = await MantraJaaps.create(param);
+
+            if (userObj) {
+                responce = JSON.stringify({ code: '200', message: "success", data: userObj });
+                res.status(200).send(responce);
+            } else {
+                responce = JSON.stringify({ code: '404', message: "Invalid User", data: '' });
                 res.status(500).send(responce);
             }
         } catch (e) {
